@@ -1,8 +1,16 @@
 ﻿@model IEnumerable<EmployeeManagementSystem.Models.Employee>
 
 <h2>Employee List</h2>
-<a href="@Url.Action("Create", "Employee")" class="btn btn-primary mb-3">Create New Employee</a>
-<table class="table">
+
+<form method="get" asp-action="Index" class="p-3">
+    <div class="form-group">
+        <input type="text" name="searchString" value="@ViewBag.SearchString" class="form-control" placeholder="Search by name or department" />
+    </div>
+    <button type="submit" class="btn btn-primary mb-3 my-3">Search</button>
+    <a href="@Url.Action("Create", "Employee")" class="btn btn-primary mb-3 my-3">Create New Employee</a>
+</form>
+
+<table class="table p-3">
     <thead>
         <tr>
             <th>First Name</th>
@@ -36,7 +44,7 @@
         @for (int i = 1; i <= ViewBag.TotalPages; i++)
         {
             <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                <a class="page-link" href="@Url.Action("Index", new { pageNumber = i })">@i</a>
+                <a class="page-link" href="@Url.Action("Index", new { pageNumber = i, searchString = ViewBag.SearchString })">@i</a>
             </li>
         }
     </ul>

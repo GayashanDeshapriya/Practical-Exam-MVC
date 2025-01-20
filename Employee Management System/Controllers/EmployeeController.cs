@@ -15,21 +15,31 @@ namespace Employee_Management_System.Controllers
             _context = context;
         }
 
-        public IActionResult Index(int pageNumber = 1, int pageSize = 10)
+        public IActionResult Index(string searchString, int pageNumber = 1, int pageSize = 10)
         {
-            var employees = _context.Employees
+            var employees = _context.Employees.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                employees = employees.Where(e => e.FirstName.Contains(searchString) ||
+                                                 e.LastName.Contains(searchString) ||
+                                                 e.Department.Contains(searchString));
+            }
+
+            var totalEmployees = employees.Count();
+            var totalPages = (int)Math.Ceiling(totalEmployees / (double)pageSize);
+
+            var paginatedEmployees = employees
                 .OrderBy(e => e.EmployeeID)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
 
-            var totalEmployees = _context.Employees.Count();
-            var totalPages = (int)Math.Ceiling(totalEmployees / (double)pageSize);
-
             ViewBag.CurrentPage = pageNumber;
             ViewBag.TotalPages = totalPages;
+            ViewBag.SearchString = searchString;
 
-            return View(employees);
+            return View(paginatedEmployees);
         }
 
         public IActionResult Create()
